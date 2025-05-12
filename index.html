@@ -1,0 +1,387 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+<style>
+    body {
+        margin: 0px;
+        padding: 0px;
+        height:100vh;
+    }
+
+    #main {
+        position: relative;
+    }
+
+    @media (max-width: 600px) {
+        #main { 
+            width: 100%;
+            height: 100vh;
+            max-height: 640px;
+            background-color: aliceblue;
+        }
+        
+        .main-text, .hidden-text {
+            text-align: center;
+            font: 22px/33px "Indie Flower", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    }
+    
+    @media (min-width: 601px) {
+        #main { 
+            margin: auto;
+            width: 480px;
+            height: 640px;
+            background-color: aliceblue;
+        }
+        
+        .main-text, .hidden-text {
+            text-align: center;
+            font: 28px/42px "Indie Flower", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    }
+
+    .main-text, .hidden-text {            
+        padding-left: 48px;
+        padding-right: 48px;
+        position: absolute;
+        display: inline-block;
+        top: 14%;
+        left: 0;
+        color: white;
+        text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+        letter-spacing: 0.1em;                
+    }
+    
+    .hidden-text {
+        position: absolute;
+        visibility: hidden;
+        height: auto;
+        width: auto;
+    }
+          
+    .typed-cursor {
+        display: none;
+    }
+
+    .transition-image, .background-image, .permanent-background-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .collage-container  {
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+
+    .collage-image {
+        width: 150%;
+    }
+
+    .hidden-collage {
+        visibility: hidden;
+    }
+</style>
+</head>
+<body>
+
+    <div id="main">
+        <div class="permanent-background-image"></div>
+        <div class="background-image"></div>
+        <div class="transition-image"></div>
+        <div class="collage-container"></div>
+        <div class="main-text"></div>
+        <div class="hidden-text"></div>
+        <div class="hidden-collage"></div>
+    </div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="typed.js"></script>
+    <script>
+
+        let backgroundImages = [''];
+
+        let poem = [
+            {
+                content: "You were my blue crayon",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/0.png"]
+            },
+            {
+                content: "The one I never had enough of",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/1.png"]
+            },
+            {
+                content: "All the other crayons would roll onto my paper wishing to be used",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/2.png",]
+            },
+            {
+                content: "but green cannot color the sky",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/3.png"]
+            },
+            {
+                content: "and red cannot color the sea",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/4.png"]
+            },
+            {
+                content: "I may never again draw a piece showing the beauty of your hue",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/5.png"],
+            },
+            {
+                content: "But I will spend the rest of my days trying to color an ocean",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/6.png"]
+            },
+            {
+                content: "as beautiful as you",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/7.png"]
+            },
+            {
+                content: "Happy Birthday &lt;3",
+                type: "gif",
+                time: 3500,
+                images: ["Pics/8.png"]
+            },
+        ];
+
+        let current = 0;
+        let currentGifTimer = null;
+        let currentGifImages = [];
+        let currentGifIndex = 0;
+        let currentGifLooping = false;
+        let currentGifElement = ".background-image";
+
+        let permanentCurrent = 0;
+        let permanentCurrentGifTimer = null;
+        let permanentCurrentGifImages = [];
+        let permanentCurrentGifIndex = 0;
+        let permanentCurrentGifLooping = false;
+
+        function setText(index) {
+				current = index;
+                var currentText = poem[index].content;
+                
+                $('.hidden-text').html(currentText);
+                var mainWidth = $('#main').width();
+                var width = $('.hidden-text').width();
+                
+                $('.main-text').css("left", mainWidth / 2 - width / 2 - 36);
+
+                startPage(index);
+        }
+
+        function startPage(index) {
+            var currentLine = poem[index];
+
+            if(poem[index].permanentBackgroundImages) {
+                permanentCurrentGifImages = poem[index].permanentBackgroundImages;
+            }
+
+            if(index >= 0) {            
+
+                clearTimeout(currentGifTimer);
+                clearTimeout(collageTimer);
+
+                let nextBackground = "";
+                if(index < poem.length) 
+                {
+                    if(poem[index].type == "gif" && poem[index].images) {
+                        nextBackground = poem[index].images[0];
+                    }
+                }
+                $(".background-image").css("background", "url('" + nextBackground + "') no-repeat center/100%");
+
+                $('.collage-container').fadeOut(500);
+                $('.transition-image').fadeOut(500);
+                $('.background-image').fadeIn(500, () => {
+                    $('.transition-image').remove();
+                    $('.background-image').addClass("transition-image");
+                    $('.background-image').removeClass("background-image");
+                    $('.main-text').before("<div class=\"background-image\" style=\"display: none\"></div>")
+
+                    currentGifElement = ".transition-image";
+
+                    switch(currentLine.type) {
+
+                        case "gif": 
+                            startGif(currentLine.images, currentLine.loop);
+                            break;
+
+                        case "collage":
+                            let images = [];
+
+                            for(let i = 0; i < currentLine.count; ++i) 
+                            {
+                                images.push(currentLine.path + "/" + i.toString().padStart(2, '0') + ".PNG");
+                            }
+
+                            startCollage(images);
+                            break;
+                    }   
+                });
+            }
+        }
+
+        function startGif(images, loop) {
+            currentGifImages = images;
+            currentGifLooping = loop;
+            currentGifIndex = 0;
+            
+            clearTimeout(currentGifTimer);
+            currentGifTimer = setTimeout(nextGifImage, 200)
+        }
+
+        function nextGifImage() {
+            currentGifIndex++;
+            if(currentGifLooping && currentGifIndex >= currentGifImages.length) {
+                currentGifIndex = 0;
+                currentGifTimer = setTimeout(nextGifImage, 200);
+                $(currentGifElement).css("background", "url('" + currentGifImages[currentGifIndex] + "') no-repeat center/100%");
+            } else if(!currentGifLooping && currentGifIndex >= currentGifImages.length) {
+                clearTimeout(currentGifTimer);
+                currentGifTimer = null;
+            }
+            else {
+                currentGifTimer = setTimeout(nextGifImage, 200);
+                $(currentGifElement).css("background", "url('" + currentGifImages[currentGifIndex] + "') no-repeat center/100%");
+            }            
+        }
+
+        function startBackgroundGif(images, loop) {
+            permanentCurrentGifImages = images;
+            permanentCurrentGifLooping = loop;
+            permanentCurrentGifIndex = 0;
+            
+            clearTimeout(permanentCurrentGifTimer);
+            permanentCurrentGifTimer = setTimeout(nextPermanentGifImage, 200)
+        }
+
+        function nextPermanentGifImage() {
+            permanentCurrentGifIndex++;
+            if(permanentCurrentGifLooping && permanentCurrentGifIndex >= permanentCurrentGifImages.length) {
+                permanentCurrentGifIndex = 0;
+                permanentCurrentGifTimer = setTimeout(nextPermanentGifImage, 200);
+                $('.permanent-background-image').css("background", "url('" + permanentCurrentGifImages[permanentCurrentGifIndex] + "') no-repeat center/100%");
+            } else if(!permanentCurrentGifLooping && permanentCurrentGifIndex >= permanentCurrentGifImages.length) {
+                clearTimeout(permanentCurrentGifTimer);
+                permanentCurrentGifTimer = null;
+            }
+            else {
+                permanentCurrentGifTimer = setTimeout(nextPermanentGifImage, 200);
+                $('.permanent-background-image').css("background", "url('" + permanentCurrentGifImages[permanentCurrentGifIndex] + "') no-repeat center/100%");
+            }            
+        }
+
+        let collageIndex = 0;
+        let collageImages = [];
+        let collageTimer = null;
+
+        function startCollage(images) {
+            $('.collage-container').css("display", "block");
+
+            collageIndex = 0;
+
+            shuffleArray(images)
+            collageImages = images;
+
+            clearTimeout(collageTimer);
+            collageTimer = setTimeout(nextCollageImage, 50)
+        }
+
+        function nextCollageImage() {    
+            let width = $('#main').width();
+            let height = $('#main').height();
+
+            clearTimeout(collageTimer);
+
+            let hiddenImage = $('<img src="' + collageImages[collageIndex] + '" />')
+            $('.hidden-collage').append(hiddenImage);
+
+            let res = $('.hidden-collage').children().first();
+            let hWidth = res.width();
+            let hHeight = res.height();
+
+            let randomWidth = hWidth > width ? 0 : (width - hWidth)
+            let randomHeight = height - hHeight;
+
+            let top = Math.round(Math.random() * randomHeight);
+            let left = Math.round(Math.random() * randomWidth);
+
+            let collageImage = $('<img class="collage-image" id="collage-' + collageIndex + '" style="position: absolute; top: ' + top + 'px; left: ' + left + 'px; " src="' + collageImages[collageIndex] + '"></div>"')
+            $('.collage-container').append(collageImage);
+            
+            ++collageIndex;
+
+            if(collageIndex < collageImages.length) {
+                setTimeout(nextCollageImage, 50);
+            }
+
+            let children = $('.hidden-collage').children();
+
+            for(let i = 0; i < children.length; ++i) {
+                children[i].remove();
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        $(document).ready(function() {
+            $(".main-text").typed({
+                strings: poem.map((s) => { return s.content; }),
+                contentType: 'html',
+                typeSpeed: 43,
+                startDelay: 500,
+                backDelay: 2500,
+                preStringTyped: function(arg) {
+                    setText(arg);
+                }
+            });
+
+            //startBackgroundGif(backgroundImages, true);
+        });
+
+    </script>
+
+    <div class="hidden-loading" style="display:none">  
+        <img src="Pics/0.png" />
+        <img src="Pics/1.png" />
+        <img src="Pics/2.png" />
+        <img src="Pics/3.png" />
+        <img src="Pics/4.png" />
+        <img src="Pics/5.png" />
+        <img src="Pics/Curtain.png" />
+    </div>
+</body>
+</html>
