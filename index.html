@@ -94,6 +94,7 @@
         visibility: hidden;
     }
 </style>
+<title>For my love</title>
 </head>
 <body>
 
@@ -116,7 +117,7 @@
 
         let poem = [
             {
-                content: "Your smile outshines the morning sun",
+               content: "Your smile outshines the morning sun",
                 type: "gif",
                 time: 3500,
                 images: ["Pics/0-0.png", 'Pics/0-1.png', 'Pics/0-2.png', 'Pics/0-3.png', 'Pics/0-4.png', 'Pics/0-5.png'],
@@ -153,25 +154,27 @@
                 content: "Forever ours, a love so true",
                 type: "gif",
                 time: 3500,
-                images: ["Pics/5.png"],
+                images: ["Pics/5-0.png", "Pics/5-1.png", "Pics/5-2.png", "Pics/5-3.png", "Pics/5-4.png", "Pics/5-5.png", "Pics/5-6.png"],
+                loop: false
             },
             {
                 content: "And just as the ocean is blue",
                 type: "gif",
                 time: 3500,
-                images: ["Pics/6.png"]
+                images: ["Pics/6-0.png", "Pics/6-1.png", "Pics/6-2.png", "Pics/6-3.png"],
+                loop: true
             },
             {
                 content: "There's nothing as beautiful as you",
-                type: "gif",
-                time: 3500,
-                images: ["Pics/7.png"]
+                type: "collage",
+                count: 11,
+                path: ["Pics/collage"]
             },
             {
                 content: "Happy Birthday &lt;3",
                 type: "gif",
                 time: 3500,
-                images: ["Pics/8.png"]
+                images: ["Pics/7-0.png"]
             },
         ];
 
@@ -243,7 +246,7 @@
 
                             for(let i = 0; i < currentLine.count; ++i) 
                             {
-                                images.push(currentLine.path + "/" + i.toString().padStart(2, '0') + ".PNG");
+                                images.push(currentLine.path + "/" + i.toString().padStart(2, '0') + ".png");
                             }
 
                             startCollage(images);
@@ -316,7 +319,7 @@
             collageImages = images;
 
             clearTimeout(collageTimer);
-            collageTimer = setTimeout(nextCollageImage, 50)
+            collageTimer = setTimeout(nextCollageImage, 250)
         }
 
         function nextCollageImage() {    
@@ -325,33 +328,39 @@
 
             clearTimeout(collageTimer);
 
-            let hiddenImage = $('<img src="' + collageImages[collageIndex] + '" />')
+            let hiddenImage = $('<img style="max-width: 300px; max-height: 450px;" src="' + collageImages[collageIndex] + '" />')
             $('.hidden-collage').append(hiddenImage);
 
-            let res = $('.hidden-collage').children().first();
-            let hWidth = res.width();
-            let hHeight = res.height();
+            hiddenImage.on('load', () => {
+                let res = $('.hidden-collage').children().first();
 
-            let randomWidth = hWidth > width ? 0 : (width - hWidth)
-            let randomHeight = height - hHeight;
+                let hWidth = res.width();
+                let hHeight = res.height();
 
-            let top = Math.round(Math.random() * randomHeight);
-            let left = Math.round(Math.random() * randomWidth);
+                let maxWidth = 300;
+                let maxHeight = 450;
 
-            let collageImage = $('<img class="collage-image" id="collage-' + collageIndex + '" style="position: absolute; top: ' + top + 'px; left: ' + left + 'px; " src="' + collageImages[collageIndex] + '"></div>"')
-            $('.collage-container').append(collageImage);
-            
-            ++collageIndex;
+                let randomWidth = hWidth > maxWidth ? width - maxWidth : width - hWidth;
+                let randomHeight = hHeight > maxHeight ? height - maxHeight : height - hHeight;
 
-            if(collageIndex < collageImages.length) {
-                setTimeout(nextCollageImage, 50);
-            }
+                let top = Math.round(Math.random() * randomHeight);
+                let left = Math.round(Math.random() * randomWidth);
 
-            let children = $('.hidden-collage').children();
+                let collageImage = $('<img class="collage-image" id="collage-' + collageIndex + '" style="position: absolute; top: ' + top + 'px; left: ' + left + 'px; max-width:300px; max-height: 450px;" src="' + collageImages[collageIndex] + '"></div>"')
+                $('.collage-container').append(collageImage);
+                
+                ++collageIndex;
 
-            for(let i = 0; i < children.length; ++i) {
-                children[i].remove();
-            }
+                if(collageIndex < collageImages.length) {
+                    setTimeout(nextCollageImage, 250);
+                }
+
+                let children = $('.hidden-collage').children();
+
+                for(let i = 0; i < children.length; ++i) {
+                    children[i].remove();
+                }
+            });          
         }
 
         function shuffleArray(array) {
@@ -392,6 +401,33 @@
         <img src="Pics/3-2.png" />
         <img src="Pics/3-3.png" />
         <img src="Pics/3-4.png" />
+        <img src="Pics/4-0.png" />
+        <img src="Pics/4-1.png" />
+        <img src="Pics/5-0.png" />
+        <img src="Pics/5-1.png" />
+        <img src="Pics/5-2.png" />
+        <img src="Pics/5-3.png" />
+        <img src="Pics/5-4.png" />
+        <img src="Pics/5-5.png" />
+        <img src="Pics/5-6.png" />
+        <img src="Pics/6-0.png" />
+        <img src="Pics/6-1.png" />
+        <img src="Pics/6-2.png" />
+        <img src="Pics/6-3.png" />
+        <img src="Pics/7-0.png" />
+
+        <img src="Pics/collage/00.png" />
+        <img src="Pics/collage/01.png" />
+        <img src="Pics/collage/02.png" />
+        <img src="Pics/collage/03.png" />
+        <img src="Pics/collage/04.png" />
+        <img src="Pics/collage/05.png" />
+        <img src="Pics/collage/06.png" />
+        <img src="Pics/collage/07.png" />
+        <img src="Pics/collage/08.png" />
+        <img src="Pics/collage/09.png" />
+        <img src="Pics/collage/10.png" />
+        <img src="Pics/collage/11.png" />
     </div>
 </body>
 </html>
