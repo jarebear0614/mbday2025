@@ -113,6 +113,30 @@
     <script src="typed.js"></script>
     <script>
 
+        function preloadImages(images, callback) 
+        {
+            var loaded   = []; // here the loaded images will be contained
+            for (let i = 0; i < images.length; i++) {
+                // wrap the loop into a closure because onload is asynchronous
+                (function(src) {
+                    // construct a new image
+                    var img = new Image();
+
+                    // use the onload event of the image
+                    // you can react to errors or load aborts using 'onerror' or 'onabort'
+                    img.onload = function() {
+                        loaded.push(img);
+
+                        // call the callback once all images are loaded
+                        loaded.length === images.length && callback.call(this, loaded); 
+                    };
+
+                    // set the source
+                    img.src = src;
+                })(images[i]);
+            }
+        }
+
         let backgroundImages = [''];
 
         let poem = [
@@ -371,15 +395,33 @@
         }
 
         $(document).ready(function() {
-            $(".main-text").typed({
-                strings: poem.map((s) => { return s.content; }),
-                contentType: 'html',
-                typeSpeed: 43,
-                startDelay: 500,
-                backDelay: 2500,
-                preStringTyped: function(arg) {
-                    setText(arg);
+
+            let images = [];
+            
+            poem.map((p) => 
+            {
+                if(p.images)
+                {                   
+                    for(let i = 0; i < p.images.length; ++i)
+                    {
+                        images.push(p.images[i]);
+                    }
                 }
+            });
+
+            preloadImages(images, () => 
+            {
+                $(".main-text").typed({
+                    strings: poem.map((s) => { return s.content; }),
+                    contentType: 'html',
+                    typeSpeed: 43,
+                    startDelay: 500,
+                    backDelay: 2500,
+                    preStringTyped: function(arg) {
+                        setText(arg);
+                    }
+                });
+
             });
 
             //startBackgroundGif(backgroundImages, true);
@@ -388,7 +430,7 @@
     </script>
 
     <div class="hidden-loading" style="display:none">  
-        <img src="Pics/0-0.png" />
+        <!-- <img src="Pics/0-0.png" />
         <img src="Pics/0-1.png" />
         <img src="Pics/0-2.png" />
         <img src="Pics/0-3.png" />
@@ -427,7 +469,7 @@
         <img src="Pics/collage/08.png" />
         <img src="Pics/collage/09.png" />
         <img src="Pics/collage/10.png" />
-        <img src="Pics/collage/11.png" />
+        <img src="Pics/collage/11.png" /> -->
     </div>
 </body>
 </html>
